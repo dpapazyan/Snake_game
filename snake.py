@@ -1,8 +1,10 @@
 import turtle
+import random
 
 WIDTH = 500
 HEIGHT = 500
-DELAY = 400  # милисекунды
+DELAY = 100  # милисекунды
+FOOD_SIZE = 10
 
 offsets = {
     "up": (0, 20),
@@ -43,14 +45,14 @@ def game_loop():
     new_head[0] += offsets[snake_direction][0]
     new_head[1] += offsets[snake_direction][1]
 
-    if new_head in snake or new_head[0] < - WIDTH/2 or new_head[0] > WIDTH/2 \
-        or new_head[1] < - HEIGHT/2 or new_head[1] > HEIGHT/2:
+    if new_head in snake or new_head[0] < - WIDTH / 2 or new_head[0] > WIDTH / 2 \
+            or new_head[1] < - HEIGHT / 2 or new_head[1] > HEIGHT / 2:
         turtle.bye()
     else:
         # добавляем новую голову змейки
         snake.append(new_head)
 
-        # удаляем хвост змейки
+    if not food_collision():
         snake.pop(0)
 
         for segment in snake:
@@ -64,6 +66,28 @@ def game_loop():
         turtle.ontimer(game_loop, DELAY)
 
 
+def food_collision():
+    global food_pos
+    if get_distance(snake[-1], food_pos) < 20:
+        food_pos = get_random_food_pos()
+        food.goto(food_pos)
+        return True
+    return False
+
+
+def get_random_food_pos():
+    x = random.randint(-WIDTH / 2 + FOOD_SIZE, WIDTH / 2 - FOOD_SIZE)
+    y = random.randint(-HEIGHT / 2 + FOOD_SIZE, HEIGHT / 2 - FOOD_SIZE)
+    return (x, y)
+
+
+def get_distance(pos1, pos2):
+    x1, y1 = pos1
+    x2, y2 = pos2
+    distance = ((y2 - y1) ** 2 + (x2 - x1) ** 2) ** 0.5  # теорема Пифагора (поиск гипотенузы)
+    return distance
+
+
 # создание окна для рисования
 screen = turtle.Screen()
 screen.setup(WIDTH, HEIGHT)
@@ -71,14 +95,12 @@ screen.title("Snake")
 screen.bgcolor("pink")
 screen.tracer(0)  # отключает автоматическую анимацию
 
-
 # управление событиями
 screen.listen()
 screen.onkey(go_up, "Up")
 screen.onkey(go_right, "Right")
 screen.onkey(go_down, "Down")
 screen.onkey(go_left, "Left")
-
 
 stamper = turtle.Turtle()
 stamper.shape("square")
@@ -92,6 +114,14 @@ snake_direction = "up"
 for segment in snake:
     stamper.goto(segment[0], segment[1])
     stamper.stamp()
+
+food = turtle.Turtle()
+food.shape("circle")
+food.color("red")
+food.shapesize(FOOD_SIZE / 20)
+food.penup()
+food_pos = get_random_food_pos()
+food.goto(food_pos)
 
 game_loop()
 

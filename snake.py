@@ -52,14 +52,15 @@ def game_loop():
         # добавляем новую голову змейки
         snake.append(new_head)
 
-    if not food_collision():
-        snake.pop(0)
+        if not food_collision():
+            snake.pop(0)
 
-        for segment in snake:
-            stamper.goto(segment[0], segment[1])
-            stamper.stamp()
+            for segment in snake:
+                stamper.goto(segment[0], segment[1])
+                stamper.stamp()
 
         # обновляем экран
+        screen.title(f"Snake game. Score: {score}")
         screen.update()
 
         # поворяем
@@ -67,8 +68,9 @@ def game_loop():
 
 
 def food_collision():
-    global food_pos
+    global food_pos, score
     if get_distance(snake[-1], food_pos) < 20:
+        score += 1
         food_pos = get_random_food_pos()
         food.goto(food_pos)
         return True
@@ -109,6 +111,7 @@ stamper.penup()
 # создаем змейку как список координат
 snake = [[0, 0], [20, 0], [40, 0], [60, 0]]
 snake_direction = "up"
+score = 0
 
 # рисуем змею
 for segment in snake:

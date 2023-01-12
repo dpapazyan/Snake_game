@@ -1,10 +1,10 @@
 import turtle
 import random
 
-WIDTH = 500
-HEIGHT = 500
-DELAY = 100  # милисекунды
-FOOD_SIZE = 10
+WIDTH = 700
+HEIGHT = 700
+DELAY = 300  # милисекунды
+FOOD_SIZE = 20
 
 offsets = {
     "up": (0, 20),
@@ -69,7 +69,7 @@ def game_loop():
     new_head[1] += offsets[snake_direction][1]
 
     if new_head in snake or new_head[0] < - WIDTH / 2 or new_head[0] > WIDTH / 2 \
-            or new_head[1] < - HEIGHT / 2 or new_head[1] > HEIGHT / 2:
+            or new_head[1] < - HEIGHT / 2 or new_head[1] > HEIGHT / 2 or DELAY == 0:
         reset()
     else:
         # добавляем новую голову змейки
@@ -91,9 +91,10 @@ def game_loop():
 
 
 def food_collision():
-    global food_pos, score
+    global food_pos, score, DELAY
     if get_distance(snake[-1], food_pos) < 20:
         score += 1
+        DELAY -= 25
         food_pos = get_random_food_pos()
         food.goto(food_pos)
         return True
@@ -114,20 +115,21 @@ def get_distance(pos1, pos2):
 
 
 def reset():
-    global score, snake, snake_direction, food_pos
+    global score, snake, snake_direction, food_pos, DELAY
     score = 0
     snake = [[0, 0], [20, 0], [40, 0], [60, 0]]
     snake_direction = "up"
     food_pos = get_random_food_pos()
     food.goto(food_pos)
     game_loop()
+    DELAY = 300
 
 
 # создание окна для рисования
 screen = turtle.Screen()
 screen.setup(WIDTH, HEIGHT)
 screen.title("Snake")
-screen.bgcolor("pink")
+screen.bgcolor("orange")
 screen.tracer(0)  # отключает автоматическую анимацию
 
 # управление событиями
@@ -139,7 +141,7 @@ bind_direction_key()
 # screen.onkey(go_left, "Left")
 
 stamper = turtle.Turtle()
-stamper.shape("square")
+stamper.shape("circle")
 stamper.penup()
 
 # создаем змейку как список координат
@@ -154,7 +156,7 @@ score = 0
 
 food = turtle.Turtle()
 food.shape("circle")
-food.color("red")
+food.color("white")
 food.shapesize(FOOD_SIZE / 20)
 food.penup()
 food_pos = get_random_food_pos()
